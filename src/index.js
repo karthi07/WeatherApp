@@ -7,19 +7,21 @@ import regeneratorRuntime from 'regenerator-runtime';
 
 
 async function getWeather(city) {
-  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=9ea09122bccc9868a9ac88372ec1ff65`, { mode: 'cors' });
+  const celcius = '&units=metric';
+  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=##${celcius}`, { mode: 'cors' });
   const data = await res.json();
+  console.log(data);
   const card = document.getElementById('detailsCard');
   card.classList = 'card bg-light my-3';
-  document.getElementById('card-header').innerHTML = city;
-  document.getElementById('card-title').innerHTML = `current temp: ${data.main.temp}`;
+  document.getElementById('card-header').innerHTML = `${data.name}  ${data.sys.country}`;
+  document.getElementById('card-title').innerHTML = `${data.main.temp}°C   ${data.weather[0].description}`;
   // console.log(`${data.name} temp: ${data.main.temp}`);
 }
 
 
-document.getElementById('searchForm').addEventListener('click', (e) => {
+document.getElementById('searchForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const city = document.getElementById('cityName').value;
   console.log(city);
-  getWeather('madurai');
+  getWeather(city);
 });
