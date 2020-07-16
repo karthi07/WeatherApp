@@ -5,29 +5,48 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import regeneratorRuntime from 'regenerator-runtime';
 
+let isCel = true;
+let deg;
+let celDeg;
+let ferDeg;
 
-async function getWeather(city) {
-  const celcius = '&units=metric';
-  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=9ea09122bccc9868a9ac88372ec1ff65`, { mode: 'cors' });
-  const data = await res.json();
+const render = (data) => {
   const icon = 'http://openweathermap.org/img/wn/10d@2x.png';
   const card = document.getElementById('detailsCard');
   card.classList = 'card bg-light my-3';
   const cel = +(`${Math.round(`${data.main.temp - 273.15}e+2`)}e-2`);
-  const celDeg = `${cel} °C `;
+  celDeg = `${cel} °C `;
   const fer = +(`${Math.round(`${(data.main.temp - 273.15) * 1.8000 + 32.00}e+2`)}e-2`);
-  const ferDeg = `${fer} °F `;
-  document.getElementById('card-header').innerHTML = `${data.name} ${data.main.temp}  ${data.sys.country}`;
-  document.getElementById('card-title').innerHTML = `${celDeg} ${ferDeg}`;
-  // console.log(`${data.name} temp: ${data.main.temp}`);
-  // ${data.weather[0].description}
-  // +(Math.round(num + "e+2")  + "e-2")
+  ferDeg = `${fer} °F `;
+
+  deg = isCel ? celDeg : ferDeg;
+  document.getElementById('card-header').innerHTML = `${data.name}  ${data.sys.country}`;
+  document.getElementById('card-title').innerHTML = `${deg}`;
+};
+
+async function getWeather(city) {
+  // console.log('helo');
+  const celcius = '&units=metric';
+  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=9ea09122bccc9868a9ac88372ec1ff65`, { mode: 'cors' });
+  const data = await res.json();
+  if (data.cod === 200) { render(data); } else { console.log(data); }
 }
 
 
 document.getElementById('searchForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const city = document.getElementById('cityName').value;
-  console.log(city);
+  const card = document.getElementById('detailsCard');
+  card.classList = 'card bg-light my-3 d-none';
   getWeather(city);
+  document.getElementById('cityName').value = '';
 });
+
+document.getElementById('tempToggle').addEventListener('click', (e) => {
+  e.preventDefault();
+  isCel = !isCel;
+  deg = isCel ? celDeg : ferDeg;
+  document.getElementById('card-title').innerHTML = `${deg}`;
+});
+
+getWeather('madurai');
